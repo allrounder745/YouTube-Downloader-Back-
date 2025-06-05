@@ -1,19 +1,15 @@
-from fastapi import FastAPI, Query
-from fastapi.responses import JSONResponse
-import yt_dlp
-
-app = FastAPI()
-
-@app.get("/")
-def home():
-    return {"status": "YouTube Downloader API is running"}
-
 @app.get("/download")
 def download(video_url: str = Query(..., alias="url")):
     try:
-        # 🔧 FIX: Remove unwanted parameters like ?si=...
-        video_url = video_url.split('&')[0]
-        video_url = video_url.split('?')[0] if "youtu.be" in video_url else video_url
+        # 🧼 Clean URL
+        if "youtube.com/shorts/" in video_url:
+            video_id = video_url.split("/shorts/")[1].split("?")[0]
+            video_url = f"https://www.youtube.com/watch?v={video_id}"
+        elif "youtu.be" in video_url:
+            video_id = video_url.split("/")[-1].split("?")[0]
+            video_url = f"https://www.youtube.com/watch?v={video_id}"
+        else:
+            video_url = video_url.split("&")[0]
 
         ydl_opts = {
             'quiet': True,
