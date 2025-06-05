@@ -11,6 +11,10 @@ def home():
 @app.get("/download")
 def download(video_url: str = Query(..., alias="url")):
     try:
+        # 🔧 FIX: Remove unwanted parameters like ?si=...
+        video_url = video_url.split('&')[0]
+        video_url = video_url.split('?')[0] if "youtu.be" in video_url else video_url
+
         ydl_opts = {
             'quiet': True,
             'skip_download': True,
